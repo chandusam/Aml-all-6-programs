@@ -1,0 +1,323 @@
+aml all 6 programs 
+
+
+#program 1
+from sklearn. datasets import load_iris
+from sklearn. neighbors import KNeighborsClassifier
+from sklearn. model_selection import train_test_split
+import numpy as np
+dataset=load_iris()
+X_train,X_test,y_train,y_test=train_test_split(dataset["data"],dataset["target"],random_state=0)
+kn=KNeighborsClassifier(n_neighbors=1)
+kn.fit(X_train,y_train)
+kn.score(X_test,y_test)
+KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski', metric_params=None,
+n_jobs=None, n_neighbors=1, p=2, weights='uniform')
+for i in range(len(X_test)):
+    x=X_test[i]
+    x_new=np.array([x])
+    prediction=kn.predict(x_new)
+print("TARGET=",y_test[i],dataset["target_names"][y_test[i]],"PREDICTED=",prediction,dataset["target_names"][prediction])
+print(kn.score(X_test,y_test))
+from sklearn.metrics import confusion_matrix
+y_pred=kn.predict(X_test)
+cm=confusion_matrix(y_test,y_pred)
+cm
+%matplotlib inline
+import matplotlib.pyplot as plt
+import seaborn as sn
+plt.figure(figsize=(7,5))
+sn.heatmap(cm,annot=True)
+plt.xlabel('predicted')
+plt.ylabel('truth')
+
+#program 2
+from sklearn.cluster import KMeans
+from sklearn import preprocessing
+from sklearn.mixture import GaussianMixture
+from sklearn.datasets import load_iris
+import sklearn.metrics as sm
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+dataset=load_iris()
+X=pd.DataFrame(dataset.data)
+X.columns=['Sepal_Length','Sepal_Width','Petal_Length','Petal_Width']
+y=pd.DataFrame(dataset.target)
+y.columns=['Targets']
+
+plt.figure(figsize=(14,7))
+colormap=np.array(['red','lime','black'])
+
+# REAL PLOT
+plt.subplot(1,3,1)
+plt.scatter(X.Petal_Length,X.Petal_Width,c=colormap[y.Targets],s=40)
+plt.title('Real')
+
+# K-PLOT
+plt.subplot(1,3,2)
+model=KMeans(n_clusters=3)
+model.fit(X)
+predY=np.choose(model.labels_,[0,1,2]).astype(np.int64)
+plt.scatter(X.Petal_Length,X.Petal_Width,c=colormap[predY],s=40)
+plt.title('KMeans')
+
+# GMM PLOT
+scaler=preprocessing.StandardScaler().fit(X)
+xsa=scaler.transform(X)
+xs=pd.DataFrame(xsa,columns=X.columns)
+gmm=GaussianMixture(n_components=3).fit(xs)
+y_cluster_gmm=gmm.predict(xs)
+plt.subplot(1,3,3)
+plt.scatter(X.Petal_Length,X.Petal_Width,c=colormap[y_cluster_gmm],s=40)
+plt.title('GMM Classification')
+
+#program 2
+from sklearn.cluster import KMeans
+from sklearn import preprocessing
+from sklearn.mixture import GaussianMixture
+from sklearn.datasets import load_iris
+import sklearn.metrics as sm
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+dataset=load_iris()
+X=pd.DataFrame(dataset.data)
+X.columns=['Sepal_Length','Sepal_Width','Petal_Length','Petal_Width']
+y=pd.DataFrame(dataset.target)
+y.columns=['Targets']
+
+plt.figure(figsize=(14,7))
+colormap=np.array(['red','lime','black'])
+
+# REAL PLOT
+plt.subplot(1,3,1)
+plt.scatter(X.Petal_Length,X.Petal_Width,c=colormap[y.Targets],s=40)
+plt.title('Real')
+
+# K-PLOT
+plt.subplot(1,3,2)
+model=KMeans(n_clusters=3)
+model.fit(X)
+predY=np.choose(model.labels_,[0,1,2]).astype(np.int64)
+plt.scatter(X.Petal_Length,X.Petal_Width,c=colormap[predY],s=40)
+plt.title('KMeans')
+
+# GMM PLOT
+scaler=preprocessing.StandardScaler().fit(X)
+xsa=scaler.transform(X)
+xs=pd.DataFrame(xsa,columns=X.columns)
+gmm=GaussianMixture(n_components=3).fit(xs)
+y_cluster_gmm=gmm.predict(xs)
+plt.subplot(1,3,3)
+plt.scatter(X.Petal_Length,X.Petal_Width,c=colormap[y_cluster_gmm],s=40)
+plt.title('GMM Classification')
+
+
+#program 4
+import random
+from math import exp
+from random import seed
+def initialize_network(n_inputs, n_hidden, n_outputs):
+    network = list()
+    hidden_layer = [{'weights':[random.uniform(-0.5,0.5) for i in range(n_inputs + 1)]} for i in range(n_hidden)]
+    network.append(hidden_layer)
+    output_layer = [{'weights':[random.uniform(-0.5,0.5) for i in range(n_hidden + 1)]} for i in range(n_outputs)]
+    network.append(output_layer)
+    i= 1
+    print("\n The initialised Neural Network:\n")
+    for layer in network:
+        j=1
+        for sub in layer:
+            print("\n Layer[%d] Node[%d]:\n" %(i,j),sub)
+            j=j+1
+            i=i+1
+        return network
+# Calculate neuron activation (net) for an input
+def activate(weights, inputs):
+    activation = weights[-1]
+    for i in range(len(weights)-1):
+        activation += weights[i] * inputs[i]
+    return activation
+# Transfer neuron activation to sigmoid function
+    def transfer(activation):
+        return 1.0 / (1.0 + exp(-activation))
+# Forward propagate input to a network output
+def activate(weights, inputs):
+    activation = weights[-1]
+    for i in range(len(weights)-1):
+        activation += weights[i] * inputs[i]
+    return activation
+# Transfer neuron activation to sigmoid function
+def transfer(activation):
+    return 1.0 / (1.0 + exp(-activation))
+# Forward propagate input to a network output
+def forward_propagate(network, row):
+    inputs = row
+    for layer in network:
+        new_inputs = []
+        for neuron in layer:
+            activation = activate(neuron['weights'], inputs)
+            neuron['output'] = transfer(activation)
+            new_inputs.append(neuron['output'])
+            inputs = new_inputs
+    return inputs
+# Calculate the derivative of an neuron output
+def transfer_derivative(output):
+    return output * (1.0 - output)
+# Backpropagate error and store in neurons
+def backward_propagate_error(network, expected):
+    for i in reversed(range(len(network))):
+        layer = network[i]
+        errors = list()
+        if i != len(network)-1:
+            for j in range(len(layer)):
+                error = 0.0
+                for neuron in network[i + 1]:
+                    error += (neuron['weights'][j] * neuron['delta'])
+                    errors.append(error)
+        else:
+            for j in range(len(layer)):
+                neuron = layer[j]
+                errors.append(expected[j] - neuron['output'])
+        for j in range(len(layer)):
+            neuron = layer[j]
+            neuron['delta'] = errors[j] * transfer_derivative(neuron['output'])
+# Update network weights with error
+def update_weights(network, row, l_rate):
+    for i in range(len(network)):
+        inputs = row[:-1]
+        if i != 0:
+            inputs = [neuron['output'] for neuron in network[i - 1]]
+        for neuron in network[i]:
+            for j in range(len(inputs)):
+                neuron['weights'][j] += l_rate * neuron['delta'] * inputs[j]
+            neuron['weights'][-1] += l_rate * neuron['delta']
+def train_network(network, train, l_rate, n_epoch, n_outputs):
+    print("\n Network Training Begins:\n")
+    for epoch in range(n_epoch):
+        sum_error = 0
+        for row in train:
+            outputs = forward_propagate(network, row)
+            expected = [0 for i in range(n_outputs)]
+            expected[row[-1]] = 1
+            sum_error += sum([(expected[i]-outputs[i])**2 for i in range(len(expected))])
+            backward_propagate_error(network, expected)
+            update_weights(network, row, l_rate)
+        print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate,sum_error))
+        print("\n Network Training Ends:\n")
+    seed(2)
+    dataset = [[2.7810836,2.550537003,0],
+        [1.465489372,2.362125076,0],
+        [3.396561688,4.400293529,0],
+        [1.38807019,1.850220317,0],
+        [3.06407232,3.005305973,0],
+        [7.627531214,2.759262235,1],
+        [5.332441248,2.088626775,1],
+        [6.922596716,1.77106367,1],
+        [8.675418651,-0.242068655,1],
+        [7.673756466,3.508563011,1]]
+    print("\n The input Data Set :\n",dataset)
+    n_inputs = len(dataset[0]) - 1
+    print("\n Number of Inputs :\n",n_inputs)
+    n_outputs = len(set([row[-1] for row in dataset]))
+    print("\n Number of Outputs :\n",n_outputs)
+#Network Initialization
+    network = initialize_network(n_inputs, 2, n_outputs)
+# Training the Network
+    train_network(network, dataset, 0.5, 20, n_outputs)
+    print("\n Final Neural Network :")
+    i= 1
+    for layer in network:
+        j=1
+        for sub in layer:
+            print("\n Layer[%d] Node[%d]:\n" %(i,j),sub)
+            j=j+1
+        i=i+1
+
+
+#program 5
+import random
+def generate_random_list(length, min_value, max_value):
+    return [random.randint(min_value, max_value) for _ in range(length)]
+def calculate_fitness(target, individual):
+    return sum(abs(a - b) for a, b in zip(target, individual))
+def mutate(individual, mutation_rate, min_value, max_value):
+    return [x + random.randint(-mutation_rate, mutation_rate) for x in individual]
+def crossover(parent1, parent2):
+    crossover_point = random.randint(0, len(parent1))
+    child = parent1[:crossover_point] + parent2[crossover_point:]
+    return child
+def genetic_algorithm(target, population_size, mutation_rate, generations, min_value, max_value):
+    population = [generate_random_list(len(target), min_value, max_value) for _ in range(population_size)]
+    for generation in range(generations):
+        fitness_scores = [calculate_fitness(target, individual) for individual in population]
+        parents = [population[i] for i in range(population_size) if random.random() < 1 / (1 + fitness_scores[i])]
+        offspring = []
+        while len(offspring) < population_size - len(parents):
+            parent1 = random.choice(parents)
+            parent2 = random.choice(parents)
+            child = crossover(parent1, parent2)
+            child = mutate(child, mutation_rate, min_value, max_value)
+            offspring.append(child)
+        population = parents + offspring
+        best_individual = min(population, key=lambda x: calculate_fitness(target, x))
+        if calculate_fitness(target, best_individual) == 0:
+            print(f"Target reached in generation {generation + 1}")
+            break
+        best_fitness = min(fitness_scores)
+        print(f"Generation {generation + 1}: Best Fitness - {best_fitness}, Best Individual - {best_individual}")
+    return best_individual
+target_list = [1, 2, 3, 4, 5]
+population_size = 100
+mutation_rate = 1
+generations = 10
+min_value = 0
+max_value = 10
+result = genetic_algorithm(target_list, population_size, mutation_rate, generations, min_value, max_value)
+print(f"Result: {result}")
+
+
+import numpy as np
+
+environment_rows = 11
+environment_columns = 11
+q_values = np.zeros((environment_rows, environment_columns, 4))
+actions = ['up', 'right', 'down', 'left']
+rewards = np.full((environment_rows, environment_columns), -100.)
+rewards[0, 5] = 100.
+aisles = {
+    1: [i for i in range(1, 10)],
+    2: [1, 7, 9],
+    3: [i for i in range(1, 8)] + [9],
+    4: [3, 7],
+    5: [i for i in range(11)],
+    6: [5],
+    7: [i for i in range(1, 10)],
+    8: [3, 7],
+    9: [i for i in range(11)]
+}
+
+# Set negative rewards for aisles
+for row_index in range(1, 10):
+    for column_index in aisles[row_index]:
+        rewards[row_index, column_index] = -1.
+
+# Print rewards matrix
+for row in rewards:
+    print(row)
+
+# Function to check if a state is a terminal state
+def is_terminal_state(current_row_index, current_column_index):
+    return rewards[current_row_index, current_column_index] == -1.
+
+# Function to get a random starting location that is not a terminal state
+def get_starting_location():
+    current_row_index = np.random.randint(environment_rows)
+    current_column_index = np.random.randint(environment_columns)
+    while is_terminal_state(current_row_index, current_column_index):
+        current_row_index = np.random.randint(environment_rows)
+        current_column_index = np.random.randint(environment_columns)
+    return current_row_index, current_column_index
+
+# ... (rest of the functions remain the same)
